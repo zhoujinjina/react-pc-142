@@ -1,15 +1,51 @@
-import { Layout, Menu, Popconfirm } from 'antd'
+import { Layout, Menu, Popconfirm } from "antd";
 import {
   HomeOutlined,
   DiffOutlined,
   EditOutlined,
-  LogoutOutlined
-} from '@ant-design/icons'
-import './index.scss'
+  LogoutOutlined,
+} from "@ant-design/icons";
+import "./index.scss";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 
-const { Header, Sider } = Layout
+const { Header, Sider } = Layout;
 
 const GeekLayout = () => {
+  const navigate = useNavigate();
+  const {pathname}=useLocation()
+  const items = [
+    {
+      key: "/",
+      icon: <HomeOutlined />,
+      label: "数据概览",
+    },
+    {
+      key: "/article",
+      icon: <DiffOutlined />,
+      label: "内容管理",
+    },
+    {
+      key: "/publish",
+      icon: <EditOutlined />,
+      label: "发布文章",
+    },
+  ];
+  const onclick = (e) => {
+    switch (e.key) {
+      case "/":
+        navigate("/");
+        break;
+      case "/article":
+        navigate("/article");
+        break;
+      case "/publish":
+        navigate("/publish");
+        break;
+      default:
+        navigate("/");
+    }
+  };
+
   return (
     <Layout>
       <Header className="header">
@@ -28,24 +64,19 @@ const GeekLayout = () => {
           <Menu
             mode="inline"
             theme="dark"
-            defaultSelectedKeys={['1']}
-            style={{ height: '100%', borderRight: 0 }}
-          >
-            <Menu.Item icon={<HomeOutlined />} key="1">
-              数据概览
-            </Menu.Item>
-            <Menu.Item icon={<DiffOutlined />} key="2">
-              内容管理
-            </Menu.Item>
-            <Menu.Item icon={<EditOutlined />} key="3">
-              发布文章
-            </Menu.Item>
-          </Menu>
+            defaultSelectedKeys={[pathname]}
+            style={{ height: "100%", borderRight: 0 }}
+            items={items}
+            onClick={(e) => onclick(e)}
+            selectedKeys={pathname}
+          ></Menu>
         </Sider>
-        <Layout className="layout-content" style={{ padding: 20 }}>0内容</Layout>
+        <Layout className="layout-content" style={{ padding: 20 }}>
+          <Outlet />
+        </Layout>
       </Layout>
     </Layout>
-  )
-}
+  );
+};
 
-export default GeekLayout
+export default GeekLayout;
