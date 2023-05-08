@@ -1,6 +1,6 @@
 //Login module
 
-import { http, setToken } from "../utils";
+import { http, removeToken, setToken } from "../utils";
 
 const { makeAutoObservable } = require("mobx");
 
@@ -21,6 +21,11 @@ class LoginStore {
     this.token=res.data.token
     setToken(this.token)
   };
+  //退出登录
+  loginOut=()=>{
+    this.token=''
+    removeToken()
+  }
 }
 
 const loginStore=new LoginStore()

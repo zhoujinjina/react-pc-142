@@ -2,6 +2,7 @@
 //实例化 请求拦截器  响应拦截器
 import axios from "axios";
 import { getToken } from "./index";
+import { history } from "./history";
 
 const http=axios.create({
     baseURL: 'http://geek.itheima.net/v1_0',
@@ -13,7 +14,7 @@ http.interceptors.request.use((config)=>{
     //if not login token
     const token=getToken()
     if(token){
-        //作为用户标识
+        //作为用户标识 http请求头部Authorization字段
         config.headers.Authorization=`Bearer ${token}`
     }
     return config
@@ -27,6 +28,11 @@ http.interceptors.response.use((response)=> {
     // 对响应数据做点什么
     return response.data
   }, (error)=> {
+    if(error.response.status===401){
+        //
+        // window.location.href="/login"
+        history.push('/login')
+    }
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
     return Promise.reject(error)

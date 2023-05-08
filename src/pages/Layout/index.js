@@ -7,12 +7,19 @@ import {
 } from "@ant-design/icons";
 import "./index.scss";
 import { Outlet, useLocation, useNavigate } from "react-router-dom";
-
+import useStore from "../../store";
+import { useEffect } from "react";
+import { observer } from "mobx-react-lite";
 const { Header, Sider } = Layout;
 
 const GeekLayout = () => {
   const navigate = useNavigate();
-  const {pathname}=useLocation()
+  const {userStore,loginStore}=useStore()
+  //获取路径
+  const { pathname } = useLocation();
+  useEffect(()=>{
+ userStore.getUserInfo()
+  },[userStore])
   const items = [
     {
       key: "/",
@@ -45,15 +52,21 @@ const GeekLayout = () => {
         navigate("/");
     }
   };
+const onConfirm=()=>{
+       //退出登录 删除token 跳回登陆
+       loginStore.loginOut()
+       navigate("/login")
+ }
 
   return (
     <Layout>
       <Header className="header">
         <div className="logo" />
         <div className="user-info">
-          <span className="user-name">user.name</span>
+          {/* name刷新消失的bug 因为mobx更新了数据 没有用observer包裹组件 无法通知视图更新 */}
+          <span className="user-name">{userStore.userinfo.name}</span>
           <span className="user-logout">
-            <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消">
+            <Popconfirm title="是否确认退出？" okText="退出" cancelText="取消" onConfirm={onConfirm}>
               <LogoutOutlined /> 退出
             </Popconfirm>
           </span>
@@ -79,4 +92,4 @@ const GeekLayout = () => {
   );
 };
 
-export default GeekLayout;
+export default observer(GeekLayout);
