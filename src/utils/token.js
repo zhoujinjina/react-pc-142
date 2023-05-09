@@ -10,6 +10,7 @@ const getToken = () => {
 };
 
 const removeToken = () => {
+  console.log("清除token")
   return window.localStorage.removeItem(key);
 };
 export{

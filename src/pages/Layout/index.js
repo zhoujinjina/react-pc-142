@@ -14,12 +14,13 @@ const { Header, Sider } = Layout;
 
 const GeekLayout = () => {
   const navigate = useNavigate();
-  const {userStore,loginStore}=useStore()
+  const {userStore,loginStore,channelStore}=useStore()
   //获取路径
   const { pathname } = useLocation();
   useEffect(()=>{
  userStore.getUserInfo()
-  },[userStore])
+ channelStore.loadChannelList()
+  },[userStore,channelStore])
   const items = [
     {
       key: "/",
@@ -72,7 +73,7 @@ const onConfirm=()=>{
           </span>
         </div>
       </Header>
-      <Layout>
+      <Layout >
         <Sider width={200} className="site-layout-background">
           <Menu
             mode="inline"
