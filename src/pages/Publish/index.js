@@ -15,19 +15,25 @@ import "react-quill/dist/quill.snow.css";
 import "./index.scss";
 import useStore from "../../store/index";
 import { observer } from "mobx-react-lite";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { http } from "../../utils";
+import { useSearchParams } from "react-router-dom";
+import Loading from "../../components/Loading";
 
 const { Option } = Select;
 
 const Publish = () => {
   const [imageCount, setImageCount] = useState(1);
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  console.log("id: " + id);
+  const form = useRef();
+  const [loading, setLoading] = useState();
   const { channelStore } = useStore();
   //存放上传图片的列表
   const [fileList, setFileList] = useState([]);
   //上传过程会触发三次 完全上传到接口可以在文件中获取文件地址
   const onUploadChange = ({ fileList }) => {
-    console.log(fileList);
     //一定要像下面这么写 才能上传成功 受控方式
     setFileList(fileList);
   };
@@ -43,12 +49,27 @@ const Publish = () => {
         type: type,
         images: fileList.map((item) => item.response.data.url),
       },
-      type:type,
-      title:title
+      type: type,
+      title: title,
     };
-    await http.post('/mp/articles?draft=false',params)
+    await http.post("/mp/articles?draft=false", params);
   };
-
+  useEffect(() => {
+    const loadDetail = async () => {
+      try {
+        setLoading(true)
+        const res = await http.get(`/mp/articles/${id}`);
+        setLoading(false);
+        form.current.setFieldsValue(res.data);
+      } catch (error) {}
+    };
+    if (id) {
+      loadDetail();
+    }
+  }, [id]);
+  if (loading) {
+    return <Loading/>
+  }
   return (
     <div className="publish">
       <Card
@@ -61,13 +82,14 @@ const Publish = () => {
                 href: "/",
               },
               {
-                title: "发布文章",
+                title: id?"编辑文章":"发布文章" ,
               },
             ]}
           ></Breadcrumb>
         }
       >
         <Form
+          ref={form}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 16 }}
           initialValues={{ type: 1 }}
@@ -137,7 +159,7 @@ const Publish = () => {
           <Form.Item wrapperCol={{ offset: 4 }}>
             <Space>
               <Button size="large" type="primary" htmlType="submit">
-                发布文章
+                {id? "更新文章":"发布文章" }
               </Button>
             </Space>
           </Form.Item>

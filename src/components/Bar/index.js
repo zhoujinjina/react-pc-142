@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import * as echarts from "echarts";
-const Bar = ({title,xData,yData,style}) => {
+const Bar = ({title,xData,yData,style,type}) => {
       //如何在react中获取dom->useRef
   //在什么地方获取dom节点->useEffect
   const domRef = useRef();
@@ -10,7 +10,7 @@ const Bar = ({title,xData,yData,style}) => {
     },
     tooltip: {},
     legend: {
-      data: ["销量"],
+      data: [type],
     },
     xAxis: {
       data: xData,
@@ -18,7 +18,7 @@ const Bar = ({title,xData,yData,style}) => {
     yAxis: {},
     series: [
       {
-        name: "销量",
+        name: type,
         type: "bar",
         data: yData,
       },
@@ -29,10 +29,10 @@ const Bar = ({title,xData,yData,style}) => {
   };
 
   useEffect(() => {
-    echartsInit();
+      echartsInit();
     //useEffect中使用了外部的函数 eslint发出警告 下行注释取消警告
      // eslint-disable-next-line react-hooks/exhaustive-deps 
-  }, []);
+  }, [ ]);
   return (
     <div>
       <div ref={domRef} style={style}></div>

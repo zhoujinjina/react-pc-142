@@ -38,19 +38,20 @@ const Article = () => {
         list: results,
         count: total_count
       })
-      console.log("article:" + res);
+
     };
     loadList();
   }, [params]);
   const formatStatus = (type) => {
     const TYPES = {
-      1: <Tag>审核失败</Tag>,
-      2: <Tag>审核失败</Tag>,
+      0: <Tag>草稿</Tag>,
+      1: <Tag>待审核</Tag>,
+      2: <Tag>审核通过</Tag>,
+      3: <Tag>审核失败</Tag>,
     };
     return TYPES[type];
   };
   const delArticle = async (data) => {
-    console.log("删除"+data.id)
     await http.delete(`/mp/articles/${data.id}`);
     setParams({ ...params, page: 1 });
   };
@@ -83,7 +84,9 @@ const Article = () => {
     {
       title: "状态",
       dataIndex: "status",
-      render: (data) => formatStatus(data.type),
+      render: (type) =>{
+        return formatStatus(type)
+      },
     },
     {
       title: "发布时间",
@@ -108,7 +111,7 @@ const Article = () => {
           <Space size="middle">
             <Button
               type="primary"
-              onClick={(data) => goPublish(data)}
+              onClick={() => goPublish(data)}
               shape="circle"
               icon={<EditOutlined />}
             />
@@ -138,7 +141,6 @@ const Article = () => {
       _params.begin_pubdate = date[0].format("YYYY-MM-DD");
       _params.end_pubdate = date[1].format("YYYY-MM-DD");
     }
-    console.log(articleData);
     setParams({ ...params, ..._params });
   };
   //   const onShowSizeChange = (current, pageSize) => {

@@ -3,7 +3,7 @@
 import axios from "axios";
 import { getToken } from "./index";
 import { history } from "./history";
-
+import {removeToken}from "./token"
 const http=axios.create({
     baseURL: 'http://geek.itheima.net/v1_0',
     timeout: 5000,
@@ -31,11 +31,13 @@ http.interceptors.response.use((response)=> {
     if(error.response.status===401){
         //
         // window.location.href="/login"
+         // 删除token
+         removeToken()
         history.push('/login')
-    }
-    // 超出 2xx 范围的状态码都会触发该函数。
-    // 对响应错误做点什么
-    return Promise.reject(error)
+        }
+        // 超出 2xx 范围的状态码都会触发该函数。
+        // 对响应错误做点什么
+        return Promise.reject(error)
 })
 
 export { http }
