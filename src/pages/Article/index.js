@@ -9,14 +9,16 @@ import {
   Table,
   Tag,
   Space,
+  Popconfirm
 } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined,MessageOutlined } from "@ant-design/icons";
 import "dayjs/locale/zh-cn";
 import { http } from "../../utils/index";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useStore from "../../store/index";
 import { observer } from "mobx-react-lite";
+import Loading from "../../components/Loading";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
@@ -24,6 +26,7 @@ const Article = () => {
   const { channelStore } = useStore();
   const channelList = channelStore.channelList;
   const [params, setParams] = useState({ page: 1, per_page: 10 });
+  const [loading, setLoading] = useState();
   const navigate = useNavigate();
   const [articleData, setArticleData] = useState({
     list: [],
@@ -32,13 +35,14 @@ const Article = () => {
 
   useEffect(() => {
     const loadList = async () => {
+      setLoading(true);
       const res = await http.get("/mp/articles", { params });
-      const { results, total_count } = res.data
+      const { results, total_count } = res.data;
       setArticleData({
         list: results,
-        count: total_count
-      })
-
+        count: total_count,
+      });
+      setLoading(false);
     };
     loadList();
   }, [params]);
@@ -65,15 +69,22 @@ const Article = () => {
       dataIndex: "cover",
       width: 120,
       render: (cover) => {
-        if(cover.images.length>0){
-          return<img
-          src={cover.images[0] || null}
-          width={80}
-          height={80}
-          alt="加载失败"
-        />
+        if (cover.images.length > 0) {
+          return (
+            <img
+              src={cover.images[0] || null}
+              width={80}
+              height={80}
+              alt="加载失败"
+            />
+          );
         }
-        return "没图片的哥们~"
+        return <img
+        src="../assets/error.png"
+        width={80}
+        height={80}
+        alt="加载失败"
+      />;
       },
     },
     {
@@ -84,8 +95,8 @@ const Article = () => {
     {
       title: "状态",
       dataIndex: "status",
-      render: (type) =>{
-        return formatStatus(type)
+      render: (type) => {
+        return formatStatus(type);
       },
     },
     {
@@ -115,13 +126,19 @@ const Article = () => {
               shape="circle"
               icon={<EditOutlined />}
             />
-            <Button
-              type="primary"
+            <Popconfirm
+             
+              title="确认删除该文章吗？"
+              okText="确认"
+              cancelText="取消"
+              onConfirm={() => delArticle(data)}
+              icon={<MessageOutlined />}
+            >
+              <Button type="primary"
               danger
-              onClick={() => delArticle(data)}
               shape="circle"
-              icon={<DeleteOutlined />}
-            />
+              icon={<DeleteOutlined />}></Button>
+            </Popconfirm>
           </Space>
         );
       },
@@ -210,22 +227,27 @@ const Article = () => {
           </Form.Item>
         </Form>
       </Card>
-      <Card title={`根据筛选条件共查询到 ${articleData.list.length} 条结果：`}>
-        <Table
-          rowKey="id"
-          columns={columns}
-          dataSource={articleData.list}
-          pagination={{
-            // defaultCurrent: "1",
-            pageSize: params.per_page,
-            total: articleData.count,
-            // totalPages: articleData.list.length,
-            // showSizeChanger: true,
-            // onShowSizeChange: onShowSizeChange,
-            onChange: pageChange,
-          }}
-        />
-      </Card>
+      {loading && <Loading />}
+      {!loading && (
+        <Card
+          title={`根据筛选条件共查询到 ${articleData.list.length} 条结果：`}
+        >
+          <Table
+            rowKey="id"
+            columns={columns}
+            dataSource={articleData.list}
+            pagination={{
+              // defaultCurrent: "1",
+              pageSize: params.per_page,
+              total: articleData.count,
+              // totalPages: articleData.list.length,
+              // showSizeChanger: true,
+              // onShowSizeChange: onShowSizeChange,
+              onChange: pageChange,
+            }}
+          />
+        </Card>
+      )}
     </div>
   );
 };

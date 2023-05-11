@@ -26,51 +26,73 @@ const Publish = () => {
   const [imageCount, setImageCount] = useState(1);
   const [searchParams] = useSearchParams();
   const id = searchParams.get("id");
-  console.log("id: " + id);
   const form = useRef();
-  const cacheImageList=useRef()
   const [loading, setLoading] = useState();
   const { channelStore } = useStore();
-  const navigate=useNavigate()
+  const navigate = useNavigate();
   //存放上传图片的列表
   const [fileList, setFileList] = useState([]);
   //上传过程会触发三次 完全上传到接口可以在文件中获取文件地址
   const onUploadChange = ({ fileList }) => {
     //一定要像下面这么写 才能上传成功 受控方式
-    setFileList(fileList);
-   
+try {
+  
+  const newFileList=fileList.map(item=>{
+    if(item.response){
+      return {
+        type:item.type,
+        url:item.response.data.url
+      }
+    }
+    return item
+  })
+  
+  setFileList(newFileList);
+} catch (error) {
+  console.log(error)
+}
+    
   };
   const radioChange = (e) => {
     setImageCount(e.target.value);
   };
   const onFinish = async (values) => {
+    navigate("/article"); //解决反应慢 多次点击会多次提交问题
     const { channel_id, content, title, type } = values;
     const params = {
       channel_id: channel_id,
       content: content,
       cover: {
         type: type,
-        images: fileList.map((item) => item.response.data.url),
+        images: fileList.map((item) => item.url),
       },
       type: type,
       title: title,
     };
-    if(id){
-       await http.put(`mp/articles/${id}?draft=false`, params)
-    }else{
+    if (id) {
+ 
+      await http.put(`mp/articles/${id}?draft=false`, params);
+    } else {
       await http.post("/mp/articles?draft=false", params);
     }
-    navigate('/article')
   };
   useEffect(() => {
     const loadDetail = async () => {
       try {
-        setLoading(true)
+        setLoading(true);
         const res = await http.get(`/mp/articles/${id}`);
         setLoading(false);
+        setImageCount(res.data.cover.type)
         form.current.setFieldsValue(res.data);
-        setFileList([res.data.cover.images])
-        cacheImageList.current=[res.data.cover.images]
+        const oldList = res.data.cover.images.map((item) => {
+          return {
+            type: "image/png",
+            url: item,
+          };
+        });
+        console.log(res.data.cover.type)
+        
+        setFileList(oldList);
       } catch (error) {}
     };
     if (id) {
@@ -78,7 +100,7 @@ const Publish = () => {
     }
   }, [id]);
   if (loading) {
-    return <Loading/>
+    return <Loading />;
   }
   return (
     <div className="publish">
@@ -92,7 +114,7 @@ const Publish = () => {
                 href: "/",
               },
               {
-                title: id?"编辑文章":"发布文章" ,
+                title: id ? "编辑文章" : "发布文章",
               },
             ]}
           ></Breadcrumb>
@@ -102,7 +124,7 @@ const Publish = () => {
           ref={form}
           labelCol={{ span: 4 }}
           wrapperCol={{ span: 16 }}
-          initialValues={{ type: 1 }}
+          initialValues={{ type:imageCount?imageCount:1 }}
           onFinish={onFinish}
         >
           <Form.Item
@@ -130,7 +152,7 @@ const Publish = () => {
 
           <Form.Item label="封面">
             <Form.Item name="type">
-              <Radio.Group onChange={radioChange}>
+              <Radio.Group onChange={radioChange} value={imageCount}>
                 <Radio value={1}>单图</Radio>
                 <Radio value={3}>三图</Radio>
                 <Radio value={0}>无图</Radio>
@@ -138,7 +160,6 @@ const Publish = () => {
             </Form.Item>
             {imageCount > 0 && (
               <Upload
-              ref={cacheImageList}
                 name="image"
                 listType="picture-card"
                 className="avatar-uploader"
@@ -148,7 +169,6 @@ const Publish = () => {
                 onChange={onUploadChange}
                 multiple={imageCount > 0}
                 maxCount={imageCount}
-                
               >
                 <div style={{ marginTop: 8 }}>
                   <PlusOutlined />
@@ -171,7 +191,7 @@ const Publish = () => {
           <Form.Item wrapperCol={{ offset: 4 }}>
             <Space>
               <Button size="large" type="primary" htmlType="submit">
-                {id? "更新文章":"发布文章" }
+                {id ? "更新文章" : "发布文章"}
               </Button>
             </Space>
           </Form.Item>

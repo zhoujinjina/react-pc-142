@@ -6,7 +6,7 @@ import { history } from "./history";
 import {removeToken}from "./token"
 const http=axios.create({
     baseURL: 'http://geek.itheima.net/v1_0',
-    timeout: 5000,
+    timeout: 10000,
 })
 
 //添加请求拦截器
@@ -28,7 +28,8 @@ http.interceptors.response.use((response)=> {
     // 对响应数据做点什么
     return response.data
   }, (error)=> {
-    if(error.response.status===401){
+   try {
+    if(error.response.status&&error.response.status===401){
         //
         // window.location.href="/login"
          // 删除token
@@ -37,6 +38,9 @@ http.interceptors.response.use((response)=> {
         }
         // 超出 2xx 范围的状态码都会触发该函数。
         // 对响应错误做点什么
+   } catch (error) {
+    
+   }
         return Promise.reject(error)
 })
 

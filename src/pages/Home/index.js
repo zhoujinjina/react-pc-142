@@ -52,7 +52,7 @@ const Home = () => {
         title="文章概览"
         type="文章数量"
         xData={["全部", "草稿", "待审核", "审核通过", "审核失败"]}
-        yData={statuscount}
+        yData={statuscount[0]>0?statuscount:[20,4,5,9,2]}
         style={{ width: "400px", height: "400px" }}
       />
     </div>
