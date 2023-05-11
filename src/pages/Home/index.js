@@ -10,7 +10,7 @@ const Home = () => {
     const loadList = async () => {
       try {
         setLoading(true);
-        const res = await http.get("/mp/articles", { page: 1, per_page: 100 });
+        const res = await http.get("/mp/articles");
         console.log("发送请求" + res);
         const { results, total_count } = res.data;
         const list = results.map((item) => item.status); //状态数组

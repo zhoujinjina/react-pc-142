@@ -17,7 +17,7 @@ import useStore from "../../store/index";
 import { observer } from "mobx-react-lite";
 import { useEffect, useRef, useState } from "react";
 import { http } from "../../utils";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 
 const { Option } = Select;
@@ -28,14 +28,17 @@ const Publish = () => {
   const id = searchParams.get("id");
   console.log("id: " + id);
   const form = useRef();
+  const cacheImageList=useRef()
   const [loading, setLoading] = useState();
   const { channelStore } = useStore();
+  const navigate=useNavigate()
   //存放上传图片的列表
   const [fileList, setFileList] = useState([]);
   //上传过程会触发三次 完全上传到接口可以在文件中获取文件地址
   const onUploadChange = ({ fileList }) => {
     //一定要像下面这么写 才能上传成功 受控方式
     setFileList(fileList);
+   
   };
   const radioChange = (e) => {
     setImageCount(e.target.value);
@@ -52,7 +55,12 @@ const Publish = () => {
       type: type,
       title: title,
     };
-    await http.post("/mp/articles?draft=false", params);
+    if(id){
+       await http.put(`mp/articles/${id}?draft=false`, params)
+    }else{
+      await http.post("/mp/articles?draft=false", params);
+    }
+    navigate('/article')
   };
   useEffect(() => {
     const loadDetail = async () => {
@@ -61,6 +69,8 @@ const Publish = () => {
         const res = await http.get(`/mp/articles/${id}`);
         setLoading(false);
         form.current.setFieldsValue(res.data);
+        setFileList([res.data.cover.images])
+        cacheImageList.current=[res.data.cover.images]
       } catch (error) {}
     };
     if (id) {
@@ -128,6 +138,7 @@ const Publish = () => {
             </Form.Item>
             {imageCount > 0 && (
               <Upload
+              ref={cacheImageList}
                 name="image"
                 listType="picture-card"
                 className="avatar-uploader"
@@ -137,6 +148,7 @@ const Publish = () => {
                 onChange={onUploadChange}
                 multiple={imageCount > 0}
                 maxCount={imageCount}
+                
               >
                 <div style={{ marginTop: 8 }}>
                   <PlusOutlined />
