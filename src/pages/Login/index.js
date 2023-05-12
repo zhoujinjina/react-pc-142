@@ -1,23 +1,25 @@
-import { Card, Button, Checkbox, Form, Input,message } from "antd";
+import { Card, Button, Checkbox, Form, Input, message } from "antd";
 import logo from "../../assets/logo.png";
 import "./index.scss";
 import useStore from "../../store";
 import { useNavigate } from "react-router-dom";
 const Login = () => {
-  const {loginStore}=useStore()
-  const navigate=useNavigate()
-  const  onFinish  =async (values) => {
-    console.log(values)
-   try {
-    //验证身份是否正确
-    await loginStore.getToken({mobile:values.username,code:values.password})
-     //跳转页面
-     navigate('/',{replace:false})//true则不能通过按钮返回原页面
-     message.success("登录成功")
-   } catch (error) {
-    message.error(error.response?.data?.message||'登录失败')
-   }  
-   
+  const { loginStore } = useStore();
+  const navigate = useNavigate();
+  const onFinish = async (values) => {
+    console.log(values);
+    try {
+      //验证身份是否正确
+      await loginStore.getToken({
+        mobile: values.username,
+        code: values.password,
+      });
+      //跳转页面
+      navigate("/", { replace: false }); //true则不能通过按钮返回原页面
+      message.success("登录成功");
+    } catch (error) {
+      message.error(error.response?.data?.message || "登录失败");
+    }
   };
   const onFinishFailed = (errorInfo) => {
     console.log("Failed:", errorInfo);
@@ -49,7 +51,7 @@ const Login = () => {
           >
             <Input size="large" placeholder="请输入手机号" />
           </Form.Item>
-     
+
           <Form.Item
             name="password"
             rules={[
@@ -67,11 +69,22 @@ const Login = () => {
           >
             <Input size="large" placeholder="请输入验证码" />
           </Form.Item>
-          <Form.Item>
-            <Checkbox className="login-checkbox-label">
-              我已阅读并同意「用户协议」和「隐私条款」
+          <Form.Item
+          className="login-checkbox-label"
+            name="agreement"
+            valuePropName="checked"
+            rules={[
+              {
+                validator: (_, value) =>
+                  value ? Promise.resolve() : Promise.reject("请同意用户协议"),
+              },
+            ]}
+          >
+            <Checkbox>
+              我已阅读并同意<a href="www.baidu.com">用户协议</a>
             </Checkbox>
           </Form.Item>
+         
           <Form.Item>
             <Button type="primary" htmlType="submit" size="large" block>
               登录

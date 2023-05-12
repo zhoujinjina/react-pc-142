@@ -6,7 +6,7 @@ import {
 // import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
 import GeekLayout from "./pages/Layout";
-import "./App.css";
+import "./App.scss";
 import AuthRoute from "./components/AuthRoute";
 import Home from "./pages/Home";
 import Publish from "./pages/Publish";

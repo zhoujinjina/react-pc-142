@@ -80,7 +80,7 @@ const Article = () => {
           );
         }
         return <img
-        src="../assets/error.png"
+        src="../../assets/error.png"
         width={80}
         height={80}
         alt="加载失败"

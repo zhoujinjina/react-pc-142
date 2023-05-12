@@ -24,7 +24,6 @@ class LoginStore {
     runInAction(() => {
       this.token = res.data.token;
     });
-
     setToken(this.token);
   };
   //退出登录
