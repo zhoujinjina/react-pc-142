@@ -5,3 +5,21 @@
 这是文章管理模块
 ![image](https://github.com/zhoujinjina/react-pc-142/assets/100776914/1b023b37-dd05-4949-9ffe-b43a1be46b9c)
 这是文章发布模块
+- **Clone：**
+
+```text
+# GitHub
+git clone https://github.com/zhoujinjina/new-todolist.git
+```
+
+- **Install：**
+
+```text
+npm install
+cnpm install
+```
+
+- **Run：**
+
+```text
+npm start
