@@ -21,6 +21,7 @@ function App() {
         <div className="app">
           <Routes>
             <Route element={<Login />} path="/login"></Route>
+            {/* 使用路由鉴权判断是否登录 */}
             <Route
               element={
                 <AuthRoute>

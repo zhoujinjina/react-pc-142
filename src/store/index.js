@@ -11,7 +11,7 @@ class RootStore {
   }
 }
 const rootStore = new RootStore();
-
+// 用context包裹，但是没有privider，使用时会找到初始值
 const context = React.createContext(rootStore);
 
 const useStore = () => useContext(context);
