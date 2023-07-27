@@ -4,6 +4,7 @@ import { http } from "../../utils";
 import Loading from "../../components/Loading";
 
 const Home = () => {
+  // 246810
   const [loading, setLoading] = useState();
   const [statuscount, setStatusCount] = useState([]);
   useEffect(() => {
